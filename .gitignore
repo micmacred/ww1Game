@@ -1,0 +1,33 @@
+# Node / React
+node_modules/
+dist/
+build/
+.cache/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+._*
+
+# Project
+.superpowers/
+.worktrees/
+.chainlink/.cache/
+chainlink/
+
+# Claude local settings
+.claude/settings.local.json
+
+# Environment
+.env
+.env.local
+
+# Screenshots
+*.png
