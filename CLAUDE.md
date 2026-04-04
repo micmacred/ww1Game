@@ -51,9 +51,35 @@ Every deliverable — design specs, implementation plans, and code — MUST pass
 4. Re-run the adversarial review to verify fixes (max 3 iterations)
 5. Report what was found and fixed as part of the deliverable summary
 
+## Visual Identity
+
+Each layer has a distinct aesthetic. These are non-negotiable art directions:
+
+| Layer | Style | Feel |
+|-------|-------|------|
+| **Theatre** | Hand-drawn period cartographic map | War room table in a French château — parchment, ink lines, period typography, wooden blocks |
+| **Campaign** | Tabletop terrain scale model | Physical, textured ground, front lines that churn with combat intensity, scorched earth behind movement |
+| **Action** | Colorized period newsreel | Desaturated base with hand-tinted colours, film grain, vignette — history as it was *remembered* |
+
+Zoom transitions between layers are seamless — no menus, no loading screens, just scale.
+
 ## UI/UX Principles (from prototyping)
 
-- No redundant panels — if it looks like it should do something, it must
-- Scarcity through resistance (disabled controls), not counters
-- Defaults should demonstrate the mechanic (never start at 0)
-- Visual feedback before moving on — show what actions are doing
+**Interaction design:**
+- iPad-first, touch-native for theatre and campaign layers; Bluetooth keyboard primary for action layer with touch fallback
+- God-mode squadron command — the player issues orders, never flies a plane directly
+- Variable game speed, pause in action layer, time-stop during resource allocation
+- Zoom in/out is always player-initiated
+
+**Information design:**
+- No redundant panels — if it looks like it should do something, it must (learned the hard way: see session-handoff.md §1)
+- Scarcity through resistance (disabled controls), not counters — no resource pool panel
+- Defaults should demonstrate the mechanic (never start at 0 — reserves default to 6)
+- Visual feedback before moving on — show what air actions are doing, not just that they're running
+- Segment cards show per-resource mini bars + composite strength meter; dispatch log shows dramatic outcomes with deciding factors
+
+**Lessons from prototyping (do not repeat these mistakes):**
+- Removed a standalone "Resource Pool" panel that confused players — looked like a theatre layer sitting above the campaign
+- Reserves must have their own full-width panel with large controls, not buried as small text
+- Air bonuses persist until Major Push (90s), not per sub-pulse — gives time to play the action layer and return
+- Always use versioned filenames for prototypes (`v1`, `v2`, etc.) — React artifacts cache aggressively
