@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "^5.2.8",
+    "@fontsource/eb-garamond": "^5.2.7",
+    "@fontsource/special-elite": "^5.2.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
