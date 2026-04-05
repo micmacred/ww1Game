@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand';
+import type { StateCreator } from 'zustand';
 import type { Pilot } from '../types';
 
 export interface RosterSlice {
