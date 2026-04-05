@@ -43,3 +43,17 @@ export const RES_OUTCOME: Record<ResourceType, { adv: string; ret: string }> = {
   equipment: { adv: 'superior firepower', ret: 'outgunned' },
   food:      { adv: 'well-supplied troops', ret: 'supply lines failing' },
 };
+
+export type ResourceLevel = 'good' | 'low' | 'critical';
+
+export const LEVEL_COL: Record<ResourceLevel, string> = {
+  good: '#2d6a2d',
+  low: '#b7770d',
+  critical: '#c0392b',
+};
+
+export const LEVEL_BG: Record<ResourceLevel, string> = {
+  good: '#d4efdf',
+  low: '#fef3cd',
+  critical: '#fde8e8',
+};

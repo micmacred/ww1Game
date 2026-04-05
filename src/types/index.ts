@@ -26,3 +26,6 @@ export type {
   Layer,
   GamePhase,
 } from './game';
+
+export type { GameConfig } from './config';
+export { DEFAULT_CONFIG } from './config';

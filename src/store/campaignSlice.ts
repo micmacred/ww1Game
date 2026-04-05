@@ -6,7 +6,7 @@ import type {
   DispatchEntry,
   AircraftPool,
 } from '../types';
-import { DEFAULT_RES, AIRCRAFT_START, makeSegments } from '../shared';
+import { DEFAULT_RES, AIRCRAFT_START, makeSegments, SUB_PULSE_SEC } from '../shared';
 
 export interface CampaignSlice {
   phase: CampaignPhase;
@@ -19,6 +19,7 @@ export interface CampaignSlice {
   selectedSegment: number | null;
   rolling: boolean;
   majorFlash: boolean;
+  tooltip: string | null;
   aircraft: AircraftPool;
   initCampaign: () => void;
   setCampaignPhase: (phase: CampaignPhase) => void;
@@ -31,6 +32,7 @@ export interface CampaignSlice {
   setLog: (log: DispatchEntry[]) => void;
   setRolling: (rolling: boolean) => void;
   setMajorFlash: (flash: boolean) => void;
+  setTooltip: (tooltip: string | null) => void;
   setAircraft: (aircraft: AircraftPool) => void;
 }
 
@@ -38,26 +40,28 @@ export const createCampaignSlice: StateCreator<CampaignSlice> = (set) => ({
   phase: 'allocation',
   segments: makeSegments(),
   reserves: { ...DEFAULT_RES },
-  pulseTimer: 0,
+  pulseTimer: SUB_PULSE_SEC,
   pulseCount: 0,
   score: 0,
   log: [],
   selectedSegment: null,
   rolling: false,
   majorFlash: false,
+  tooltip: null,
   aircraft: { ...AIRCRAFT_START },
   initCampaign: () =>
     set({
       phase: 'allocation',
       segments: makeSegments(),
       reserves: { ...DEFAULT_RES },
-      pulseTimer: 0,
+      pulseTimer: SUB_PULSE_SEC,
       pulseCount: 0,
       score: 0,
       log: [],
       selectedSegment: null,
       rolling: false,
       majorFlash: false,
+      tooltip: null,
       aircraft: { ...AIRCRAFT_START },
     }),
   setCampaignPhase: (phase) => set({ phase }),
@@ -70,5 +74,6 @@ export const createCampaignSlice: StateCreator<CampaignSlice> = (set) => ({
   setLog: (log) => set({ log }),
   setRolling: (rolling) => set({ rolling }),
   setMajorFlash: (flash) => set({ majorFlash: flash }),
+  setTooltip: (tooltip) => set({ tooltip }),
   setAircraft: (aircraft) => set({ aircraft }),
 });

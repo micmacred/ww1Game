@@ -5,7 +5,9 @@ export { SUB_PULSE_SEC, NUM_PULSES, MAJOR_EVERY } from './timing';
 export {
   TOTAL_RES, DEFAULT_RES, RES_WEIGHT, RES,
   RES_ICON, RES_COL, RES_BG, RES_DESC, RES_OUTCOME,
+  LEVEL_COL, LEVEL_BG,
 } from './resources';
+export type { ResourceLevel } from './resources';
 
 export { NUM_SEGMENTS, MAX_POS, SEG_NAMES } from './front';
 
