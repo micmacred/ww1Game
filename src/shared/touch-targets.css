@@ -1,0 +1,27 @@
+/* Touch target standards — iPad-first (44pt minimum, 48pt under time pressure) */
+
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Ensure tap area even if visual is smaller */
+  position: relative;
+}
+
+.touch-target-pressure {
+  min-width: 48px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Utility: expand tap area beyond visual bounds */
+.touch-expand::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
