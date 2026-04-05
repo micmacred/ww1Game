@@ -1,0 +1,12 @@
+/* Period typography — imported once in main.tsx */
+@import '@fontsource/eb-garamond/400.css';
+@import '@fontsource/eb-garamond/700.css';
+@import '@fontsource/barlow-condensed/400.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/special-elite/400.css';
+
+:root {
+  --font-theatre: 'EB Garamond', 'Libre Caslon Text', Georgia, serif;
+  --font-campaign: 'Barlow Condensed', 'Oswald', 'Arial Narrow', sans-serif;
+  --font-action: 'Special Elite', 'Courier New', monospace;
+}
