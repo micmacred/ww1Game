@@ -83,3 +83,32 @@ Zoom transitions between layers are seamless — no menus, no loading screens, j
 - Reserves must have their own full-width panel with large controls, not buried as small text
 - Air bonuses persist until Major Push (90s), not per sub-pulse — gives time to play the action layer and return
 - Always use versioned filenames for prototypes (`v1`, `v2`, etc.) — React artifacts cache aggressively
+
+## Workflow Skill Boundaries (nklisch/skills plugin)
+
+The following nklisch/skills are approved for use in this project as specialist
+analysis and design tools. Their outputs feed into superpowers' writing-plans,
+NOT into nklisch's own implement/implement-orchestrator.
+
+**Approved nklisch skills:**
+- **bold-refactor** — architectural reconception via conceptual lenses
+- **cruft-cleaner** — systematic AI debris removal
+- **perf-design** — profiling-driven performance optimization design
+- **research** — library/API investigation with reference skill output
+- **roadmap** — multi-phase project decomposition
+
+**Handoff rule:** When an nklisch skill produces a design document, do NOT
+invoke nklisch's `implement` or `implement-orchestrator`. Instead, use the
+design document as input to superpowers' `writing-plans` skill.
+
+**Roadmap adaptation:** This project does not use VISION.md / SPEC.md /
+ARCHITECTURE.md. When the `roadmap` skill requests foundation documents,
+use these instead:
+- `game-design-document.md` — serves as VISION + SPEC
+- `session-handoff.md` — serves as ARCHITECTURE + current state
+- `CLAUDE.md` — serves as constraints and principles
+
+**Do NOT use** these nklisch skills (superpowers handles these concerns):
+design, implement, implement-orchestrator, ideate, expand, feature, release,
+extract-patterns, refactor-design, e2e-test-design, test-quality,
+update-documentation, security-review.
