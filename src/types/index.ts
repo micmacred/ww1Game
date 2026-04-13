@@ -11,10 +11,11 @@ export type {
 } from './campaign';
 
 export type {
-  SectorId,
-  Sector,
-  TheatreTurnPhase,
+  SectorId, SectorDefinition, SectorState, SectorTurnResult,
+  DispatchCategory, TheatreDispatch, TheatreTurnPhase,
+  SealState, TheatreSaveState,
 } from './theatre';
+export { SECTOR_IDS, PHASE_DISPLAY } from './theatre';
 
 export type {
   DogfightOrder,

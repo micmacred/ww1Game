@@ -4,7 +4,7 @@ import { CampaignLayer } from './layers/campaign/CampaignLayer';
 import { ActionLayer } from './layers/action/ActionLayer';
 import type { Layer } from './types';
 
-const LAYERS: Record<Layer, () => JSX.Element> = {
+const LAYERS: Record<Layer, () => React.JSX.Element> = {
   theatre: TheatreLayer,
   campaign: CampaignLayer,
   action: ActionLayer,

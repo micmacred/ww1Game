@@ -1,0 +1,114 @@
+<h2>Theatre Layer: Screen Composition</h2>
+<p class="subtitle">How should the 1024x768 iPad landscape be divided between the map and UI panels?</p>
+
+<div class="cards">
+  <!-- Option A: Map-dominant -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #F5E6D3;">
+      <div style="display: flex; height: 280px; gap: 8px; font-family: 'Georgia', serif; color: #2C1810;">
+        <!-- Map area -->
+        <div style="flex: 3; background: linear-gradient(135deg, #F5E6D3 0%, #E8D5B7 100%); border: 2px solid #8B7355; border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div style="font-size: 14px; opacity: 0.6; text-align: center;">
+            <div style="font-size: 18px; margin-bottom: 8px;">SECTOR MAP</div>
+            <div>~75% of screen</div>
+            <div style="font-size: 11px; margin-top: 4px;">Sectors, front lines, wooden blocks</div>
+          </div>
+          <!-- Mini blocks -->
+          <div style="position: absolute; top: 40px; left: 60px; width: 24px; height: 24px; background: #4A6FA5; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+          <div style="position: absolute; top: 80px; left: 120px; width: 24px; height: 24px; background: #8B3A3A; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+          <div style="position: absolute; bottom: 60px; right: 80px; width: 24px; height: 24px; background: #4A6FA5; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+        </div>
+        <!-- Side panel -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; text-align: center; font-size: 11px;">
+            <div style="font-weight: bold; margin-bottom: 4px;">TURN 3</div>
+            <div style="opacity: 0.7;">Review Phase</div>
+          </div>
+          <div style="flex: 1; background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; font-size: 11px;">
+            <div style="font-weight: bold; margin-bottom: 4px;">SELECTED SECTOR</div>
+            <div style="opacity: 0.7;">Sector details, resources, intel appear here when tapped</div>
+          </div>
+          <div style="background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; text-align: center; font-size: 11px;">
+            <div style="font-weight: bold;">BEGIN TURN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Map-Dominant + Side Panel</h3>
+      <p>Map takes ~75% width. Narrow right panel for turn info, sector details, and actions. Tapping a sector populates the side panel. Resource allocation opens as an overlay.</p>
+      <p style="font-size: 13px; opacity: 0.7;">Maximises the war-room table feel. Side panel risks feeling cramped for allocation controls.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Map + Bottom Drawer -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #F5E6D3;">
+      <div style="display: flex; flex-direction: column; height: 280px; gap: 8px; font-family: 'Georgia', serif; color: #2C1810;">
+        <!-- Map area -->
+        <div style="flex: 2; background: linear-gradient(135deg, #F5E6D3 0%, #E8D5B7 100%); border: 2px solid #8B7355; border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div style="font-size: 14px; opacity: 0.6; text-align: center;">
+            <div style="font-size: 18px; margin-bottom: 8px;">SECTOR MAP</div>
+            <div>Full width, ~65% height</div>
+          </div>
+          <div style="position: absolute; top: 30px; left: 80px; width: 24px; height: 24px; background: #4A6FA5; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+          <div style="position: absolute; top: 50px; right: 100px; width: 24px; height: 24px; background: #8B3A3A; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+        </div>
+        <!-- Bottom panel -->
+        <div style="flex: 1; display: flex; gap: 8px;">
+          <div style="flex: 1; background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; font-size: 11px; text-align: center;">
+            <div style="font-weight: bold;">TURN 3</div>
+            <div style="opacity: 0.7;">Phase indicator</div>
+          </div>
+          <div style="flex: 2; background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; font-size: 11px;">
+            <div style="font-weight: bold;">SECTOR: VERDUN</div>
+            <div style="opacity: 0.7;">Resources &bull; Intel &bull; Front position</div>
+          </div>
+          <div style="flex: 1; background: #E8D5B7; border: 1px solid #8B7355; border-radius: 4px; padding: 8px; font-size: 11px; display: flex; align-items: center; justify-content: center;">
+            <div style="font-weight: bold;">BEGIN TURN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Full-Width Map + Bottom Drawer</h3>
+      <p>Map spans entire width at ~65% height. Bottom third is a persistent drawer for turn state, selected sector, and actions. Allocation expands the drawer upward over the map.</p>
+      <p style="font-size: 13px; opacity: 0.7;">Map reads better at full width. Bottom drawer mirrors how the campaign layer's reserves panel works.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Map-Only + Modal Phases -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #F5E6D3;">
+      <div style="height: 280px; font-family: 'Georgia', serif; color: #2C1810; position: relative;">
+        <!-- Full map -->
+        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #F5E6D3 0%, #E8D5B7 100%); border: 2px solid #8B7355; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+          <div style="font-size: 14px; opacity: 0.6; text-align: center;">
+            <div style="font-size: 18px; margin-bottom: 8px;">SECTOR MAP</div>
+            <div>100% of screen</div>
+          </div>
+          <div style="position: absolute; top: 40px; left: 60px; width: 24px; height: 24px; background: #4A6FA5; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+          <div style="position: absolute; top: 80px; left: 140px; width: 24px; height: 24px; background: #8B3A3A; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+          <div style="position: absolute; bottom: 50px; right: 60px; width: 24px; height: 24px; background: #4A6FA5; border-radius: 3px; box-shadow: 2px 2px 4px rgba(44,24,16,0.4);"></div>
+        </div>
+        <!-- Overlay hint -->
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(44,24,16,0.85); color: #F5E6D3; padding: 16px 24px; border-radius: 6px; font-size: 12px; text-align: center; border: 1px solid #8B7355;">
+          <div style="font-weight: bold; margin-bottom: 4px;">ALLOCATE RESOURCES</div>
+          <div style="opacity: 0.8;">Phases appear as overlays on the map</div>
+        </div>
+        <!-- Turn badge -->
+        <div style="position: absolute; top: 12px; right: 12px; background: rgba(44,24,16,0.8); color: #F5E6D3; padding: 6px 12px; border-radius: 4px; font-size: 11px;">TURN 3</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Full-Screen Map + Phase Overlays</h3>
+      <p>Map fills entire screen. Turn info as a small badge. Tapping a sector opens a detail popover. Allocation phase slides in as a translucent overlay. Results phase overlays the map with animated updates.</p>
+      <p style="font-size: 13px; opacity: 0.7;">Most immersive war-room feel. Risk: overlays can feel like interruptions rather than part of the flow.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+  <h3>Key trade-off</h3>
+  <p>More map = more immersive, but UI controls need to live somewhere. The campaign layer learned that burying controls leads to confusion. The question is whether theatre's slower pace (no timer pressure) allows overlays where campaign couldn't.</p>
+</div>

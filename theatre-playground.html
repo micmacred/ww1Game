@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theatre Layer Playground — Skies of the Great War</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f0f0f;
+    color: #ccc;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #controls {
+    grid-row: 1 / 3;
+    background: #1a1a1a;
+    border-right: 1px solid #333;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  #controls h1 {
+    font-size: 14px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+  }
+
+  .group { margin-bottom: 20px; }
+
+  .group-title {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .control { margin-bottom: 12px; }
+
+  .control label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 4px;
+  }
+
+  .control label .val {
+    color: #666;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #646cff;
+    height: 4px;
+    cursor: pointer;
+  }
+
+  input[type="color"] {
+    width: 32px;
+    height: 24px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .preset-btn {
+    padding: 4px 10px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .preset-btn:hover { background: #333; border-color: #646cff; }
+  .preset-btn.active { background: #646cff; color: #fff; border-color: #646cff; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 8px;
+  }
+
+  .toggle-row input[type="checkbox"] { accent-color: #646cff; }
+
+  #preview-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: auto;
+    background: #111;
+  }
+
+  #preview-frame {
+    width: 1024px;
+    height: 768px;
+    transform-origin: top left;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  }
+
+  #prompt-area {
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  #prompt-text {
+    flex: 1;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.5;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  #copy-btn {
+    padding: 6px 14px;
+    background: #646cff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  #copy-btn:hover { background: #5558e6; }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <h1>Theatre Layer</h1>
+  <div class="preset-row" id="presets"></div>
+
+  <!-- Parchment -->
+  <div class="group">
+    <div class="group-title">Parchment</div>
+    <div class="control">
+      <label>Base colour <input type="color" id="parchBase" value="#F5E6D3"></label>
+    </div>
+    <div class="control">
+      <label>Fold lines <input type="color" id="foldCol" value="#E8D5B7"></label>
+    </div>
+    <div class="control">
+      <label>Noise intensity <span class="val" id="noiseVal">0.03</span></label>
+      <input type="range" id="noise" min="0" max="0.08" step="0.005" value="0.03">
+    </div>
+    <div class="control">
+      <label>Vignette <span class="val" id="vigVal">0.15</span></label>
+      <input type="range" id="vignette" min="0" max="0.4" step="0.01" value="0.15">
+    </div>
+  </div>
+
+  <!-- Ink -->
+  <div class="group">
+    <div class="group-title">Ink &amp; Borders</div>
+    <div class="control">
+      <label>Ink colour <input type="color" id="inkCol" value="#5C3A00"></label>
+    </div>
+    <div class="control">
+      <label>Border width <span class="val" id="borderWVal">1.5</span></label>
+      <input type="range" id="borderW" min="0.5" max="4" step="0.25" value="1.5">
+    </div>
+    <div class="control">
+      <label>Hand-drawn wobble <span class="val" id="wobbleVal">2</span></label>
+      <input type="range" id="wobble" min="0" max="6" step="0.5" value="2">
+    </div>
+  </div>
+
+  <!-- Sector Fills -->
+  <div class="group">
+    <div class="group-title">Sector Fills</div>
+    <div class="control">
+      <label>Player fill <input type="color" id="playerFill" value="#C8D8C0"></label>
+    </div>
+    <div class="control">
+      <label>Enemy fill <input type="color" id="enemyFill" value="#D8C0C0"></label>
+    </div>
+    <div class="control">
+      <label>Contested fill <input type="color" id="contestFill" value="#D8D0B8"></label>
+    </div>
+    <div class="control">
+      <label>Fill opacity <span class="val" id="fillOpVal">0.5</span></label>
+      <input type="range" id="fillOp" min="0.1" max="0.9" step="0.05" value="0.5">
+    </div>
+    <div class="control">
+      <label>Selected glow <input type="color" id="glowCol" value="#D4A030"></label>
+    </div>
+    <div class="control">
+      <label>Glow radius <span class="val" id="glowRVal">8</span></label>
+      <input type="range" id="glowR" min="0" max="20" step="1" value="8">
+    </div>
+  </div>
+
+  <!-- Blocks -->
+  <div class="group">
+    <div class="group-title">Wooden Blocks</div>
+    <div class="control">
+      <label>Player block <input type="color" id="playerBlockCol" value="#5B6B3C"></label>
+    </div>
+    <div class="control">
+      <label>Enemy block <input type="color" id="enemyBlockCol" value="#6B3C3C"></label>
+    </div>
+    <div class="control">
+      <label>Block width <span class="val" id="blockWVal">28</span></label>
+      <input type="range" id="blockW" min="16" max="44" step="1" value="28">
+    </div>
+    <div class="control">
+      <label>Block height <span class="val" id="blockHVal">14</span></label>
+      <input type="range" id="blockH" min="8" max="24" step="1" value="14">
+    </div>
+    <div class="control">
+      <label>Offset from front <span class="val" id="blockOffVal">18</span></label>
+      <input type="range" id="blockOff" min="6" max="40" step="1" value="18">
+    </div>
+    <div class="control">
+      <label>Bevel strength <span class="val" id="bevelVal">2</span></label>
+      <input type="range" id="bevel" min="0" max="5" step="0.5" value="2">
+    </div>
+    <div class="control">
+      <label>Block shadow <span class="val" id="blockShadowVal">3</span></label>
+      <input type="range" id="blockShadow" min="0" max="8" step="0.5" value="3">
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="showLabels" checked>
+      <label for="showLabels">Show block labels</label>
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="showPips" checked>
+      <label for="showPips">Show strength pips</label>
+    </div>
+  </div>
+
+  <!-- Front Line -->
+  <div class="group">
+    <div class="group-title">Front Line</div>
+    <div class="control">
+      <label>Gap width <span class="val" id="gapWVal">6</span></label>
+      <input type="range" id="gapW" min="0" max="16" step="1" value="6">
+    </div>
+    <div class="control">
+      <label>Line colour <input type="color" id="frontCol" value="#8B0000"></label>
+    </div>
+    <div class="control">
+      <label>Line width <span class="val" id="frontWVal">2</span></label>
+      <input type="range" id="frontW" min="0" max="6" step="0.5" value="2">
+    </div>
+    <div class="control">
+      <label>Line dash <span class="val" id="frontDashVal">8</span></label>
+      <input type="range" id="frontDash" min="0" max="20" step="1" value="8">
+    </div>
+  </div>
+
+  <!-- Typography -->
+  <div class="group">
+    <div class="group-title">Typography</div>
+    <div class="control">
+      <label>Title size <span class="val" id="titleSzVal">28</span></label>
+      <input type="range" id="titleSz" min="18" max="40" step="1" value="28">
+    </div>
+    <div class="control">
+      <label>Sector label size <span class="val" id="labelSzVal">13</span></label>
+      <input type="range" id="labelSz" min="9" max="18" step="0.5" value="13">
+    </div>
+    <div class="control">
+      <label>Title colour <input type="color" id="titleCol" value="#3A2800"></label>
+    </div>
+    <div class="control">
+      <label>Letter spacing <span class="val" id="lsVal">3</span></label>
+      <input type="range" id="ls" min="0" max="8" step="0.5" value="3">
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="group">
+    <div class="group-title">Layout</div>
+    <div class="control">
+      <label>Allocation panel height <span class="val" id="allocHVal">140</span></label>
+      <input type="range" id="allocH" min="80" max="220" step="5" value="140">
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="showAlloc" checked>
+      <label for="showAlloc">Show allocation panel</label>
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="showTurnInfo" checked>
+      <label for="showTurnInfo">Show turn info</label>
+    </div>
+  </div>
+</div>
+
+<div id="preview-area">
+  <div id="preview-frame"></div>
+</div>
+
+<div id="prompt-area">
+  <div id="prompt-text">Adjust controls to generate a visual direction prompt.</div>
+  <button id="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+</div>
+
+<script>
+// ── STATE ──
+const DEFAULTS = {
+  parchBase: '#F5E6D3', foldCol: '#E8D5B7', noise: 0.03, vignette: 0.15,
+  inkCol: '#5C3A00', borderW: 1.5, wobble: 2,
+  playerFill: '#C8D8C0', enemyFill: '#D8C0C0', contestFill: '#D8D0B8',
+  fillOp: 0.5, glowCol: '#D4A030', glowR: 8,
+  playerBlockCol: '#5B6B3C', enemyBlockCol: '#6B3C3C',
+  blockW: 28, blockH: 14, blockOff: 18, bevel: 2, blockShadow: 3,
+  showLabels: true, showPips: true,
+  gapW: 6, frontCol: '#8B0000', frontW: 2, frontDash: 8,
+  titleSz: 28, labelSz: 13, titleCol: '#3A2800', ls: 3,
+  allocH: 140, showAlloc: true, showTurnInfo: true,
+};
+
+const state = { ...DEFAULTS };
+
+// ── MAP DATA ──
+// 8 Western Front sectors with polygon regions
+const SECTORS = [
+  { id: 'flanders', name: 'Flanders', control: 'contested',
+    poly: [[80,60],[250,50],[280,160],[220,240],[100,200]],
+    center: [170, 140], capital: false },
+  { id: 'artois', name: 'Artois', control: 'player',
+    poly: [[100,200],[220,240],[260,340],[140,360],[70,280]],
+    center: [155, 285], capital: false },
+  { id: 'picardy', name: 'Picardy', control: 'player',
+    poly: [[140,360],[260,340],[340,420],[280,500],[130,460]],
+    center: [220, 410], capital: false },
+  { id: 'ile-de-france', name: 'Ile-de-France', control: 'player',
+    poly: [[130,460],[280,500],[320,590],[200,620],[100,540]],
+    center: [200, 540], capital: true },
+  { id: 'champagne', name: 'Champagne', control: 'contested',
+    poly: [[280,160],[460,120],[520,260],[440,360],[260,340],[220,240]],
+    center: [360, 240], capital: false },
+  { id: 'verdun', name: 'Verdun', control: 'contested',
+    poly: [[440,360],[520,260],[680,220],[720,360],[620,440],[340,420]],
+    center: [530, 340], capital: false },
+  { id: 'lorraine', name: 'Lorraine', control: 'enemy',
+    poly: [[620,440],[720,360],[880,320],[900,480],[760,540]],
+    center: [770, 420], capital: false },
+  { id: 'alsace', name: 'Alsace', control: 'enemy',
+    poly: [[760,540],[900,480],[950,400],[980,560],[920,660],[780,640]],
+    center: [870, 550], capital: true },
+];
+
+// Front line path — the winding line between Allied and Central Powers
+// Blocks will be arrayed along this line, facing each other across it
+const FRONT_POINTS = [
+  { x: 250, y: 50,  seg: 'flanders',  pStr: 2, eStr: 3 },
+  { x: 268, y: 110, seg: 'flanders',  pStr: 3, eStr: 2 },
+  { x: 280, y: 160, seg: 'artois',    pStr: 2, eStr: 2 },
+  { x: 260, y: 250, seg: 'artois',    pStr: 3, eStr: 1 },
+  { x: 260, y: 340, seg: 'champagne', pStr: 2, eStr: 3 },
+  { x: 350, y: 380, seg: 'champagne', pStr: 1, eStr: 2 },
+  { x: 440, y: 360, seg: 'verdun',    pStr: 3, eStr: 3 },
+  { x: 520, y: 260, seg: 'verdun',    pStr: 2, eStr: 2 },
+  { x: 600, y: 240, seg: 'verdun',    pStr: 1, eStr: 2 },
+  { x: 680, y: 220, seg: 'lorraine',  pStr: 1, eStr: 3 },
+  { x: 720, y: 360, seg: 'lorraine',  pStr: 2, eStr: 2 },
+  { x: 800, y: 420, seg: 'lorraine',  pStr: 1, eStr: 1 },
+  { x: 900, y: 480, seg: 'alsace',    pStr: 2, eStr: 3 },
+  { x: 950, y: 400, seg: 'alsace',    pStr: 1, eStr: 2 },
+];
+
+// ── SEEDED RANDOM ──
+function seededRand(seed) {
+  let s = seed;
+  return function() { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+}
+
+function wobblePath(points, amount) {
+  const rng = seededRand(points.reduce((a, p) => a + p[0] * 7 + p[1] * 13, 42));
+  if (amount < 0.1) return points.map(p => p.join(',')).join(' ');
+  return points.map(p => {
+    const wx = p[0] + (rng() - 0.5) * amount * 2;
+    const wy = p[1] + (rng() - 0.5) * amount * 2;
+    return `${wx.toFixed(1)},${wy.toFixed(1)}`;
+  }).join(' ');
+}
+
+// Get normal (perpendicular) direction at a point on the front line
+function getNormal(idx) {
+  const pts = FRONT_POINTS;
+  let dx, dy;
+  if (idx === 0) {
+    dx = pts[1].x - pts[0].x; dy = pts[1].y - pts[0].y;
+  } else if (idx === pts.length - 1) {
+    dx = pts[idx].x - pts[idx-1].x; dy = pts[idx].y - pts[idx-1].y;
+  } else {
+    dx = pts[idx+1].x - pts[idx-1].x; dy = pts[idx+1].y - pts[idx-1].y;
+  }
+  const len = Math.sqrt(dx*dx + dy*dy) || 1;
+  // Normal is perpendicular: rotate 90 degrees
+  // We want player side (left of direction) and enemy side (right)
+  return { nx: -dy/len, ny: dx/len };
+}
+
+let selectedSector = 'verdun';
+
+// ── RENDER ──
+function render() {
+  const f = document.getElementById('preview-frame');
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768" style="background:${state.parchBase};">`;
+
+  // Defs
+  svg += `<defs>`;
+  svg += `<filter id="parchNoise" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="${state.noise}" numOctaves="4" seed="42" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="${state.wobble * 3}" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>`;
+  svg += `<filter id="selGlow">
+    <feGaussianBlur stdDeviation="${state.glowR}" result="blur"/>
+    <feFlood flood-color="${state.glowCol}" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>`;
+  // Block shadow + bevel
+  svg += `<filter id="blockShadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="1" dy="${state.blockShadow * 0.5}" stdDeviation="${state.blockShadow * 0.4}" flood-color="rgba(0,0,0,0.45)"/>
+  </filter>`;
+  svg += `<filter id="blockBevel" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0.5" dy="${state.blockShadow * 0.5}" stdDeviation="${state.blockShadow * 0.35}" flood-color="rgba(0,0,0,0.4)"/>
+    <feSpecularLighting in="SourceAlpha" surfaceScale="${state.bevel}" specularConstant="0.6" specularExponent="25" result="spec" lighting-color="#FFFDE0">
+      <fePointLight x="-200" y="-300" z="400"/>
+    </feSpecularLighting>
+    <feComposite in="spec" in2="SourceAlpha" operator="in" result="specClip"/>
+    <feComposite in="SourceGraphic" in2="specClip" operator="arithmetic" k1="0" k2="1" k3="0.4" k4="0"/>
+  </filter>`;
+  svg += `<radialGradient id="vig" cx="50%" cy="50%" r="70%">
+    <stop offset="60%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,${state.vignette})"/>
+  </radialGradient>`;
+  svg += `</defs>`;
+
+  // Parchment base
+  svg += `<rect x="0" y="0" width="1024" height="768" fill="${state.parchBase}"/>`;
+  // Fold lines
+  for (let y = 192; y < 768; y += 192) {
+    svg += `<line x1="0" y1="${y}" x2="1024" y2="${y}" stroke="${state.foldCol}" stroke-width="1.5" opacity="0.5"/>`;
+  }
+  svg += `<line x1="512" y1="0" x2="512" y2="768" stroke="${state.foldCol}" stroke-width="1" opacity="0.3"/>`;
+
+  // Turn info bar
+  if (state.showTurnInfo) {
+    svg += `<rect x="0" y="0" width="1024" height="48" fill="${state.parchBase}" opacity="0.92"/>`;
+    svg += `<line x1="0" y1="48" x2="1024" y2="48" stroke="${state.inkCol}" stroke-width="1" opacity="0.3"/>`;
+    svg += `<text x="24" y="34" font-family="'EB Garamond',Georgia,serif" font-size="${state.titleSz}px"
+      fill="${state.titleCol}" letter-spacing="${state.ls}px" font-weight="bold">THE WESTERN FRONT</text>`;
+    svg += `<text x="780" y="28" font-family="'EB Garamond',Georgia,serif" font-size="14px"
+      fill="${state.inkCol}" opacity="0.7">Turn 4 of 30</text>`;
+    svg += `<text x="780" y="44" font-family="'EB Garamond',Georgia,serif" font-size="11px"
+      fill="${state.inkCol}" opacity="0.5" letter-spacing="1.5px">REVIEW PHASE</text>`;
+  }
+
+  // Sector polygons
+  SECTORS.forEach(sec => {
+    const fill = sec.control === 'player' ? state.playerFill
+      : sec.control === 'enemy' ? state.enemyFill : state.contestFill;
+    const isSelected = sec.id === selectedSector;
+    const filterAttr = isSelected ? ' filter="url(#selGlow)"' : '';
+
+    svg += `<polygon points="${wobblePath(sec.poly, state.wobble)}"
+      fill="${fill}" fill-opacity="${state.fillOp}"
+      stroke="${state.inkCol}" stroke-width="${state.borderW}"
+      stroke-linejoin="round"${filterAttr}
+      style="cursor:pointer" data-sector="${sec.id}"/>`;
+
+    // Sector name
+    svg += `<text x="${sec.center[0]}" y="${sec.center[1] - (sec.capital ? 18 : 8)}"
+      font-family="'EB Garamond',Georgia,serif" font-size="${state.labelSz}px"
+      fill="${state.inkCol}" text-anchor="middle" letter-spacing="1.5px"
+      font-variant="small-caps" opacity="0.75">${sec.name}</text>`;
+
+    if (sec.capital) {
+      svg += `<text x="${sec.center[0]}" y="${sec.center[1] - 4}"
+        font-family="'EB Garamond',Georgia,serif" font-size="10px"
+        fill="${state.inkCol}" text-anchor="middle" opacity="0.45" font-style="italic">&#9733; capital</text>`;
+    }
+  });
+
+  // ── FRONT LINE (subtle, between blocks) ──
+  if (state.frontW > 0) {
+    const rng = seededRand(7919);
+    let pathD = '';
+    FRONT_POINTS.forEach((pt, i) => {
+      const wx = pt.x + (rng() - 0.5) * state.wobble * 2;
+      const wy = pt.y + (rng() - 0.5) * state.wobble * 2;
+      pathD += (i === 0 ? 'M ' : ' L ') + wx.toFixed(1) + ',' + wy.toFixed(1);
+    });
+    const dashAttr = state.frontDash > 0 ? ` stroke-dasharray="${state.frontDash} ${state.frontDash * 0.6}"` : '';
+    svg += `<path d="${pathD}" fill="none" stroke="${state.frontCol}" stroke-width="${state.frontW}"
+      stroke-linecap="round" stroke-linejoin="round"${dashAttr} opacity="0.5"/>`;
+  }
+
+  // ── WOODEN BLOCKS — arrayed along the front line ──
+  const blockRng = seededRand(31337);
+
+  FRONT_POINTS.forEach((pt, idx) => {
+    const { nx, ny } = getNormal(idx);
+    const totalOff = state.blockOff + state.gapW / 2;
+
+    // Angle of the front line tangent at this point
+    let tx, ty;
+    if (idx === 0) { tx = FRONT_POINTS[1].x - pt.x; ty = FRONT_POINTS[1].y - pt.y; }
+    else if (idx === FRONT_POINTS.length - 1) { tx = pt.x - FRONT_POINTS[idx-1].x; ty = pt.y - FRONT_POINTS[idx-1].y; }
+    else { tx = FRONT_POINTS[idx+1].x - FRONT_POINTS[idx-1].x; ty = FRONT_POINTS[idx+1].y - FRONT_POINTS[idx-1].y; }
+    const angle = Math.atan2(ty, tx) * 180 / Math.PI;
+
+    // Small random rotation for hand-placed feel
+    const pJitter = (blockRng() - 0.5) * 6;
+    const eJitter = (blockRng() - 0.5) * 6;
+
+    // Player blocks (left of front = player/allied side)
+    for (let b = 0; b < pt.pStr; b++) {
+      const dist = totalOff + b * (state.blockH + 4);
+      const bx = pt.x + nx * dist;
+      const by = pt.y + ny * dist;
+      const rot = angle + pJitter + (blockRng() - 0.5) * 3;
+
+      svg += `<g transform="translate(${bx.toFixed(1)},${by.toFixed(1)}) rotate(${rot.toFixed(1)})" filter="url(#blockBevel)">`;
+      svg += `<rect x="${-state.blockW/2}" y="${-state.blockH/2}" width="${state.blockW}" height="${state.blockH}"
+        rx="2" fill="${state.playerBlockCol}" stroke="${darken(state.playerBlockCol, 0.3)}" stroke-width="0.5"/>`;
+      // Wood grain lines
+      svg += `<line x1="${-state.blockW/2 + 3}" y1="${-state.blockH/2 + 2}" x2="${state.blockW/2 - 3}" y2="${-state.blockH/2 + 2}"
+        stroke="${lighten(state.playerBlockCol, 0.15)}" stroke-width="0.5" opacity="0.4"/>`;
+      svg += `<line x1="${-state.blockW/2 + 2}" y1="${state.blockH/2 - 2}" x2="${state.blockW/2 - 2}" y2="${state.blockH/2 - 2}"
+        stroke="${darken(state.playerBlockCol, 0.15)}" stroke-width="0.5" opacity="0.3"/>`;
+      if (state.showLabels && b === 0) {
+        svg += `<text x="0" y="${state.blockH/2 - 3}" font-family="'EB Garamond',Georgia,serif" font-size="7px"
+          fill="${lighten(state.playerBlockCol, 0.6)}" text-anchor="middle" font-weight="bold"
+          letter-spacing="0.5px">FR</text>`;
+      }
+      svg += `</g>`;
+    }
+
+    // Strength pips for player side
+    if (state.showPips && pt.pStr > 0) {
+      const pipDist = totalOff + pt.pStr * (state.blockH + 4) + 4;
+      const px = pt.x + nx * pipDist;
+      const py = pt.y + ny * pipDist;
+      for (let p = 0; p < pt.pStr; p++) {
+        const pp = p - (pt.pStr - 1) / 2;
+        svg += `<circle cx="${(px + pp * 6).toFixed(1)}" cy="${py.toFixed(1)}" r="2" fill="${state.playerBlockCol}" opacity="0.5"/>`;
+      }
+    }
+
+    // Enemy blocks (right of front = enemy/Central Powers side)
+    for (let b = 0; b < pt.eStr; b++) {
+      const dist = totalOff + b * (state.blockH + 4);
+      const bx = pt.x - nx * dist;
+      const by = pt.y - ny * dist;
+      const rot = angle + 180 + eJitter + (blockRng() - 0.5) * 3;
+
+      svg += `<g transform="translate(${bx.toFixed(1)},${by.toFixed(1)}) rotate(${rot.toFixed(1)})" filter="url(#blockBevel)">`;
+      svg += `<rect x="${-state.blockW/2}" y="${-state.blockH/2}" width="${state.blockW}" height="${state.blockH}"
+        rx="2" fill="${state.enemyBlockCol}" stroke="${darken(state.enemyBlockCol, 0.3)}" stroke-width="0.5"/>`;
+      svg += `<line x1="${-state.blockW/2 + 3}" y1="${-state.blockH/2 + 2}" x2="${state.blockW/2 - 3}" y2="${-state.blockH/2 + 2}"
+        stroke="${lighten(state.enemyBlockCol, 0.15)}" stroke-width="0.5" opacity="0.4"/>`;
+      svg += `<line x1="${-state.blockW/2 + 2}" y1="${state.blockH/2 - 2}" x2="${state.blockW/2 - 2}" y2="${state.blockH/2 - 2}"
+        stroke="${darken(state.enemyBlockCol, 0.15)}" stroke-width="0.5" opacity="0.3"/>`;
+      if (state.showLabels && b === 0) {
+        svg += `<text x="0" y="${state.blockH/2 - 3}" font-family="'EB Garamond',Georgia,serif" font-size="7px"
+          fill="${lighten(state.enemyBlockCol, 0.6)}" text-anchor="middle" font-weight="bold"
+          letter-spacing="0.5px">DE</text>`;
+      }
+      svg += `</g>`;
+    }
+
+    // Strength pips for enemy side
+    if (state.showPips && pt.eStr > 0) {
+      const pipDist = totalOff + pt.eStr * (state.blockH + 4) + 4;
+      const px = pt.x - nx * pipDist;
+      const py = pt.y - ny * pipDist;
+      for (let p = 0; p < pt.eStr; p++) {
+        const pp = p - (pt.eStr - 1) / 2;
+        svg += `<circle cx="${(px + pp * 6).toFixed(1)}" cy="${py.toFixed(1)}" r="2" fill="${state.enemyBlockCol}" opacity="0.5"/>`;
+      }
+    }
+  });
+
+  // Vignette
+  svg += `<rect x="0" y="0" width="1024" height="768" fill="url(#vig)" pointer-events="none"/>`;
+
+  // Allocation panel
+  if (state.showAlloc) {
+    const panelY = 768 - state.allocH;
+    svg += `<rect x="0" y="${panelY}" width="1024" height="${state.allocH}" fill="${state.parchBase}" opacity="0.95"/>`;
+    svg += `<line x1="0" y1="${panelY}" x2="1024" y2="${panelY}" stroke="${state.inkCol}" stroke-width="1.5" opacity="0.4"/>`;
+    svg += `<text x="24" y="${panelY + 24}" font-family="'EB Garamond',Georgia,serif"
+      font-size="11px" fill="${state.inkCol}" letter-spacing="2px" opacity="0.6" font-weight="bold">RESOURCE ALLOCATION</text>`;
+
+    const resources = [
+      { name: 'Manpower', col: '#7b3f00', val: 14, max: 18 },
+      { name: 'Equipment', col: '#1a3c5e', val: 11, max: 18 },
+      { name: 'Food', col: '#2d5a1b', val: 16, max: 18 },
+    ];
+
+    resources.forEach((r, i) => {
+      const ry = panelY + 44 + i * 30;
+      svg += `<text x="24" y="${ry + 4}" font-family="'EB Garamond',Georgia,serif"
+        font-size="13px" fill="${r.col}" font-weight="bold">${r.name}</text>`;
+      svg += `<rect x="124" y="${ry - 8}" width="300" height="14" rx="3" fill="${r.col}" opacity="0.15"/>`;
+      svg += `<rect x="124" y="${ry - 8}" width="${300 * r.val / r.max}" height="14" rx="3" fill="${r.col}" opacity="0.5"/>`;
+      svg += `<text x="434" y="${ry + 4}" font-family="'EB Garamond',Georgia,serif"
+        font-size="12px" fill="${state.inkCol}" opacity="0.7">${r.val}/${r.max}</text>`;
+    });
+
+    const sel = SECTORS.find(s => s.id === selectedSector);
+    if (sel) {
+      svg += `<text x="550" y="${panelY + 24}" font-family="'EB Garamond',Georgia,serif"
+        font-size="11px" fill="${state.inkCol}" letter-spacing="2px" opacity="0.6" font-weight="bold">
+        SELECTED: ${sel.name.toUpperCase()}</text>`;
+      svg += `<text x="550" y="${panelY + 50}" font-family="'EB Garamond',Georgia,serif"
+        font-size="14px" fill="${state.inkCol}" opacity="0.8">
+        Control: ${sel.control}</text>`;
+      svg += `<text x="550" y="${panelY + 72}" font-family="'EB Garamond',Georgia,serif"
+        font-size="13px" fill="${state.inkCol}" opacity="0.6" font-style="italic">
+        ${sel.capital ? '\u2605 Capital city' : 'Standard sector'}</text>`;
+      svg += `<rect x="550" y="${panelY + 86}" width="160" height="36" rx="4" fill="${state.inkCol}" opacity="0.85"/>`;
+      svg += `<text x="630" y="${panelY + 109}" font-family="'EB Garamond',Georgia,serif"
+        font-size="14px" fill="${state.parchBase}" text-anchor="middle" letter-spacing="2px" font-weight="bold">FIGHT HERE</text>`;
+    }
+  }
+
+  svg += `</svg>`;
+  f.innerHTML = svg;
+  scalePreview();
+
+  // Sector click
+  f.querySelectorAll('[data-sector]').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedSector = el.getAttribute('data-sector');
+      render();
+    });
+  });
+}
+
+// ── COLOR UTILS ──
+function hexToHSL(hex) {
+  let r = parseInt(hex.slice(1,3), 16) / 255;
+  let g = parseInt(hex.slice(3,5), 16) / 255;
+  let b = parseInt(hex.slice(5,7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+  }
+  return [h * 360, s * 100, l * 100];
+}
+
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => { const k = (n + h / 30) % 12; const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * Math.max(0, Math.min(1, c))).toString(16).padStart(2, '0'); };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function darken(hex, amount) {
+  const [h, s, l] = hexToHSL(hex);
+  return hslToHex(h, s, Math.max(0, l - amount * 100));
+}
+
+function lighten(hex, amount) {
+  const [h, s, l] = hexToHSL(hex);
+  return hslToHex(h, s, Math.min(100, l + amount * 100));
+}
+
+// ── SCALE ──
+function scalePreview() {
+  const area = document.getElementById('preview-area');
+  const frame = document.getElementById('preview-frame');
+  const scaleX = (area.clientWidth - 40) / 1024;
+  const scaleY = (area.clientHeight - 40) / 768;
+  frame.style.transform = `scale(${Math.min(scaleX, scaleY, 1)})`;
+}
+
+// ── PROMPT ──
+function updatePrompt() {
+  const parts = [];
+  const d = DEFAULTS;
+
+  if (state.parchBase !== d.parchBase) parts.push(`parchment base ${state.parchBase}`);
+  if (state.noise !== d.noise) parts.push(`noise ${state.noise > 0.04 ? 'heavy' : state.noise < 0.02 ? 'subtle' : 'moderate'} (${state.noise})`);
+  if (state.vignette !== d.vignette) parts.push(`vignette ${Math.round(state.vignette * 100)}%`);
+  if (state.inkCol !== d.inkCol) parts.push(`ink colour ${state.inkCol}`);
+  if (state.borderW !== d.borderW) parts.push(`${state.borderW}px borders`);
+  if (state.wobble !== d.wobble) parts.push(`wobble ${state.wobble} (${state.wobble > 4 ? 'very sketchy' : state.wobble < 1 ? 'precise' : 'hand-drawn'})`);
+  if (state.playerFill !== d.playerFill) parts.push(`player sectors ${state.playerFill}`);
+  if (state.enemyFill !== d.enemyFill) parts.push(`enemy sectors ${state.enemyFill}`);
+  if (state.fillOp !== d.fillOp) parts.push(`sector fill ${Math.round(state.fillOp * 100)}% opacity`);
+  if (state.glowCol !== d.glowCol) parts.push(`selection glow ${state.glowCol}`);
+
+  // Block description
+  const blockParts = [];
+  if (state.playerBlockCol !== d.playerBlockCol) blockParts.push(`player blocks ${state.playerBlockCol}`);
+  if (state.enemyBlockCol !== d.enemyBlockCol) blockParts.push(`enemy blocks ${state.enemyBlockCol}`);
+  if (state.blockW !== d.blockW || state.blockH !== d.blockH) blockParts.push(`${state.blockW}x${state.blockH}px blocks`);
+  if (state.blockOff !== d.blockOff) blockParts.push(`${state.blockOff}px offset from front`);
+  if (state.bevel !== d.bevel) blockParts.push(`bevel ${state.bevel}`);
+  if (state.blockShadow !== d.blockShadow) blockParts.push(`shadow ${state.blockShadow}`);
+  if (!state.showLabels) blockParts.push('no labels');
+  if (!state.showPips) blockParts.push('no strength pips');
+
+  if (state.frontW !== d.frontW) parts.push(`front line ${state.frontW}px`);
+  if (state.frontCol !== d.frontCol) parts.push(`front line colour ${state.frontCol}`);
+  if (state.gapW !== d.gapW) parts.push(`${state.gapW}px gap between block rows`);
+
+  if (state.titleSz !== d.titleSz) parts.push(`title ${state.titleSz}px`);
+  if (state.labelSz !== d.labelSz) parts.push(`sector labels ${state.labelSz}px`);
+  if (state.allocH !== d.allocH) parts.push(`allocation panel ${state.allocH}px`);
+  if (!state.showAlloc) parts.push('allocation panel hidden');
+
+  const prompt = document.getElementById('prompt-text');
+  const blockDesc = blockParts.length > 0 ? ` Block customizations: ${blockParts.join('; ')}.` : '';
+
+  if (parts.length === 0 && blockParts.length === 0) {
+    prompt.textContent = 'Using default style. Wooden blocks are arrayed along the front line in two opposing rows — player (olive/FR) and enemy (maroon/DE). Block count per position indicates local force concentration. Adjust controls to explore.';
+  } else {
+    prompt.textContent = `Theatre layer visual direction: Parchment cartographic map with EB Garamond typography. Wooden blocks arrayed in two opposing rows along the front line, like an operations room plotting table. Player blocks face enemy blocks across a gap — the front IS the space between the block rows. Block density shows force concentration per sector segment.${blockDesc} ${parts.length > 0 ? 'Customizations: ' + parts.join('; ') + '.' : ''}`;
+  }
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('prompt-text').textContent).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Prompt', 1500);
+  });
+}
+
+// ── WIRING ──
+function updateAll() { render(); updatePrompt(); }
+
+function wireControl(id, key, parse = parseFloat) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const valEl = document.getElementById(id + 'Val');
+  if (el.type === 'checkbox') {
+    el.checked = state[key];
+    el.addEventListener('change', () => { state[key] = el.checked; updateAll(); });
+  } else if (el.type === 'color') {
+    el.value = state[key];
+    el.addEventListener('input', () => { state[key] = el.value; updateAll(); });
+  } else if (el.type === 'range') {
+    el.value = state[key];
+    if (valEl) valEl.textContent = state[key];
+    el.addEventListener('input', () => {
+      state[key] = parse(el.value);
+      if (valEl) valEl.textContent = el.value;
+      updateAll();
+    });
+  }
+}
+
+wireControl('parchBase', 'parchBase', String);
+wireControl('foldCol', 'foldCol', String);
+wireControl('noise', 'noise');
+wireControl('vignette', 'vignette');
+wireControl('inkCol', 'inkCol', String);
+wireControl('borderW', 'borderW');
+wireControl('wobble', 'wobble');
+wireControl('playerFill', 'playerFill', String);
+wireControl('enemyFill', 'enemyFill', String);
+wireControl('contestFill', 'contestFill', String);
+wireControl('fillOp', 'fillOp');
+wireControl('glowCol', 'glowCol', String);
+wireControl('glowR', 'glowR');
+wireControl('playerBlockCol', 'playerBlockCol', String);
+wireControl('enemyBlockCol', 'enemyBlockCol', String);
+wireControl('blockW', 'blockW');
+wireControl('blockH', 'blockH');
+wireControl('blockOff', 'blockOff');
+wireControl('bevel', 'bevel');
+wireControl('blockShadow', 'blockShadow');
+wireControl('showLabels', 'showLabels');
+wireControl('showPips', 'showPips');
+wireControl('gapW', 'gapW');
+wireControl('frontCol', 'frontCol', String);
+wireControl('frontW', 'frontW');
+wireControl('frontDash', 'frontDash');
+wireControl('titleSz', 'titleSz');
+wireControl('labelSz', 'labelSz');
+wireControl('titleCol', 'titleCol', String);
+wireControl('ls', 'ls');
+wireControl('allocH', 'allocH');
+wireControl('showAlloc', 'showAlloc');
+wireControl('showTurnInfo', 'showTurnInfo');
+
+// Presets
+const PRESETS = {
+  'Ops Room': { ...DEFAULTS },
+  'Dense Front': {
+    ...DEFAULTS, blockW: 32, blockH: 16, blockOff: 14, bevel: 3, blockShadow: 4,
+    gapW: 4, frontW: 1, showPips: false,
+  },
+  'Dark War Room': {
+    ...DEFAULTS, parchBase: '#3A3020', foldCol: '#2A2418', noise: 0.04, vignette: 0.3,
+    inkCol: '#8B7A50', borderW: 1.0, wobble: 1.5,
+    playerFill: '#4A5A40', enemyFill: '#5A3A3A', contestFill: '#4A4838',
+    fillOp: 0.6, glowCol: '#C89030', glowR: 10,
+    playerBlockCol: '#6B7B4C', enemyBlockCol: '#7B4C4C',
+    blockW: 26, blockH: 13, blockOff: 16, bevel: 1.5, blockShadow: 2,
+    frontCol: '#CC3333', frontW: 1.5, gapW: 8,
+    titleSz: 26, labelSz: 12, titleCol: '#C8B888', ls: 4,
+  },
+  'Bold & Clear': {
+    ...DEFAULTS, parchBase: '#F8EED8', noise: 0.02, vignette: 0.08,
+    inkCol: '#2A1800', borderW: 2.5, wobble: 1,
+    playerFill: '#A8C8A0', enemyFill: '#C8A0A0',
+    fillOp: 0.6, glowCol: '#E0A020',
+    playerBlockCol: '#4A5A2C', enemyBlockCol: '#5A2C2C',
+    blockW: 34, blockH: 17, blockOff: 20, bevel: 3, blockShadow: 4,
+    frontCol: '#880000', frontW: 3, frontDash: 0, gapW: 8,
+    titleSz: 32, labelSz: 14, titleCol: '#2A1800',
+  },
+  'Sketch Map': {
+    ...DEFAULTS, parchBase: '#FAF5EC', noise: 0.01, vignette: 0.05,
+    inkCol: '#444444', borderW: 0.75, wobble: 4,
+    playerFill: '#D8E8D0', enemyFill: '#E8D0D0', contestFill: '#E0DCD0',
+    fillOp: 0.3, glowCol: '#BBAA44',
+    playerBlockCol: '#5A6A3A', enemyBlockCol: '#6A3A3A',
+    blockW: 22, blockH: 11, blockOff: 16, bevel: 1, blockShadow: 2,
+    showLabels: false, showPips: false,
+    frontCol: '#666666', frontW: 1, frontDash: 6, gapW: 10,
+    titleSz: 22, labelSz: 11, titleCol: '#444444', ls: 5,
+  },
+};
+
+function syncControls() {
+  document.querySelectorAll('#controls input').forEach(el => {
+    const key = el.id;
+    if (!(key in state)) return;
+    if (el.type === 'checkbox') el.checked = state[key];
+    else el.value = state[key];
+    const valEl = document.getElementById(key + 'Val');
+    if (valEl) valEl.textContent = state[key];
+  });
+}
+
+const presetsEl = document.getElementById('presets');
+Object.entries(PRESETS).forEach(([name, values]) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn' + (name === 'Ops Room' ? ' active' : '');
+  btn.textContent = name;
+  btn.addEventListener('click', () => {
+    Object.assign(state, values);
+    syncControls();
+    presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateAll();
+  });
+  presetsEl.appendChild(btn);
+});
+
+window.addEventListener('resize', scalePreview);
+updateAll();
+</script>
+</body>
+</html>
