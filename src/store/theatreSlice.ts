@@ -267,23 +267,23 @@ export function selectSealState(state: TheatreSlice): SealState {
   switch (turnPhase) {
     case 'review':
       if (hasUnreadCritical) {
-        return { enabled: false, label: 'Lire les Dépêches', reason: 'critical-unread' };
+        return { enabled: false, label: 'Read Dispatches', reason: 'critical-unread' };
       }
-      return { enabled: true, label: 'Commencer Allocation' };
+      return { enabled: true, label: 'Begin Allocation' };
     case 'allocate':
-      return { enabled: true, label: 'Sceller les Ordres' };
+      return { enabled: true, label: 'Seal Orders' };
     case 'select':
       if (!chosenSector) {
-        return { enabled: false, label: 'Choisir un Secteur', reason: 'no-sector-chosen' };
+        return { enabled: false, label: 'Choose a Sector', reason: 'no-sector-chosen' };
       }
-      return { enabled: true, label: 'Lancer la Résolution' };
+      return { enabled: true, label: 'Begin Resolution' };
     case 'resolve':
-      return { enabled: false, label: 'Résolution en cours…', reason: 'no-sector-chosen' };
+      return { enabled: false, label: 'Resolving…', reason: 'no-sector-chosen' };
     case 'update':
       if (hasUnreadCritical) {
-        return { enabled: false, label: 'Lire les Dépêches', reason: 'critical-unread' };
+        return { enabled: false, label: 'Read Dispatches', reason: 'critical-unread' };
       }
-      return { enabled: true, label: 'Tour Suivant' };
+      return { enabled: true, label: 'Next Turn' };
   }
 }
 

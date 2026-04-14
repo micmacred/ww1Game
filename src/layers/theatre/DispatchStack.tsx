@@ -9,25 +9,28 @@ interface DispatchStackProps {
 }
 
 export function DispatchStack({ dispatches, onMarkRead }: DispatchStackProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [readingIndex, setReadingIndex] = useState(0);
+  // Snapshot of unread dispatches, captured when reader opens — stable during reading
+  const [snapshot, setSnapshot] = useState<TheatreDispatch[]>([]);
 
   const unread = dispatches.filter((d) => !d.isRead);
   const hasCritical = unread.some((d) => d.isCritical);
+  const isOpen = snapshot.length > 0;
 
   const handleOpenStack = () => {
     if (unread.length === 0) return;
+    setSnapshot([...unread]);
     setReadingIndex(0);
-    setIsOpen(true);
   };
 
+  const current = isOpen ? snapshot[readingIndex] : null;
+
   const handleNextDispatch = () => {
-    const current = unread[readingIndex];
     if (current) onMarkRead(current.id);
-    if (readingIndex < unread.length - 1) {
+    if (readingIndex < snapshot.length - 1) {
       setReadingIndex(readingIndex + 1);
     } else {
-      setIsOpen(false);
+      setSnapshot([]);
     }
   };
 
@@ -57,23 +60,23 @@ export function DispatchStack({ dispatches, onMarkRead }: DispatchStackProps) {
             position: 'absolute', bottom: 8, right: 8,
             fontFamily: FONTS.theatre, fontSize: 11, color: THEATRE.fadedInk, fontStyle: 'italic',
           }}>
-            {unread.length} d{'\u00E9'}p{'\u00EA'}che{unread.length > 1 ? 's' : ''}
+            {unread.length} dispatch{unread.length > 1 ? 'es' : ''}
           </div>
         )}
       </div>
 
-      {isOpen && unread[readingIndex] && (
+      {isOpen && current && (
         <div onClick={handleNextDispatch} style={{
           position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(44,24,16,0.7)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
         }}>
           <div style={{
-            width: unread[readingIndex].isWarCorrespondent ? 500 : 420,
+            width: current.isWarCorrespondent ? 500 : 420,
             minHeight: 200, background: THEATRE.dispatchPaper, borderRadius: 4,
             padding: '24px 32px', boxShadow: `0 8px 32px rgba(0,0,0,0.5)`,
-            transform: unread[readingIndex].isWarCorrespondent ? 'rotate(-1deg)' : 'none',
+            transform: current.isWarCorrespondent ? 'rotate(-1deg)' : 'none',
           }}>
-            {unread[readingIndex].isCritical && (
+            {current.isCritical && (
               <div style={{
                 width: 36, height: 36, borderRadius: '50%', background: THEATRE.criticalSeal,
                 boxShadow: `0 2px 4px ${THEATRE.blockShadow}`, margin: '0 auto 16px',
@@ -83,21 +86,21 @@ export function DispatchStack({ dispatches, onMarkRead }: DispatchStackProps) {
               fontFamily: "'Special Elite', monospace", fontSize: 14,
               lineHeight: 1.6, color: THEATRE.ink,
             }}>
-              {unread[readingIndex].text}
+              {current.text}
             </div>
-            {unread[readingIndex].isWarCorrespondent && (
+            {current.isWarCorrespondent && (
               <div style={{
                 marginTop: 20, fontFamily: "'Architects Daughter', cursive",
                 fontSize: 13, color: THEATRE.dimInk, textAlign: 'right',
               }}>
-                — Votre correspondant de guerre
+                — Your war correspondent
               </div>
             )}
             <div style={{
               marginTop: 16, fontFamily: FONTS.theatre, fontSize: 11,
               color: THEATRE.fadedInk, textAlign: 'center',
             }}>
-              {readingIndex + 1} / {unread.length} — toucher pour continuer
+              {readingIndex + 1} / {snapshot.length} — tap to continue
             </div>
           </div>
         </div>

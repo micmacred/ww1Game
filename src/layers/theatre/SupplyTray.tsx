@@ -34,7 +34,7 @@ export function SupplyTray({ surplusPool }: SupplyTrayProps) {
       }}
     >
       {(['manpower', 'equipment', 'food'] as const).map((res) => {
-        const count = Math.round(surplusPool[res]);
+        const count = Math.floor(surplusPool[res]);
         return (
           <div
             key={res}

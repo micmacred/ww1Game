@@ -24,9 +24,11 @@ function territoryFill(control: SectorState['control']): string {
   }
 }
 
-function blockCount(sector: SectorState): number {
-  return Math.round(sector.baseline.manpower + sector.allocated.manpower);
-}
+const TOKEN_STYLES: Record<string, React.CSSProperties> = {
+  manpower: { borderRadius: 1, background: `linear-gradient(135deg, ${THEATRE.manpowerBlock}, #5a2e00)` },
+  equipment: { borderRadius: '50%', background: `linear-gradient(135deg, ${THEATRE.equipmentToken}, #0e2a44)` },
+  food: { borderRadius: '4px 4px 6px 6px', background: `linear-gradient(135deg, ${THEATRE.foodToken}, #1a3d10)` },
+};
 
 export function TheatreMap({
   sectors,
@@ -154,7 +156,7 @@ export function TheatreMap({
           fill={THEATRE.ink}
           opacity={0.6}
         >
-          Front Occidental — Carte d&apos;État-Major
+          Western Front — Staff Map
         </text>
 
         {/* Off-map capital markers */}
@@ -166,7 +168,7 @@ export function TheatreMap({
           fontStyle="italic"
           fill={THEATRE.fadedInk}
         >
-          ← VERS PARIS
+          ← TO PARIS
         </text>
         <text
           x={940}
@@ -176,7 +178,7 @@ export function TheatreMap({
           fontStyle="italic"
           fill={THEATRE.fadedInk}
         >
-          VERS BERLIN →
+          TO BERLIN →
         </text>
 
         {/* Reveal pencil-mark text */}
@@ -196,33 +198,32 @@ export function TheatreMap({
         )}
       </svg>
 
-      {/* Manpower blocks overlay (DOM nodes, not SVG) */}
+      {/* Manpower tokens — near the front (just below centroid, player side) */}
       {SECTOR_ORDER.map((id) => {
         const def = THEATRE_SECTORS[id];
-        const count = blockCount(sectors[id]);
-
+        const count = Math.round(sectors[id].allocated.manpower);
+        if (count <= 0) return null;
         return (
           <div
-            key={`blocks-${id}`}
+            key={`manpower-${id}`}
             style={{
               position: 'absolute',
-              left: def.centroid[0] - 15,
-              top: def.centroid[1] - 5,
+              left: def.centroid[0] - 12,
+              top: def.centroid[1] + 10,
               display: 'flex',
               gap: 2,
               flexWrap: 'wrap',
-              width: 40,
+              width: 36,
               pointerEvents: 'none',
             }}
           >
-            {Array.from({ length: Math.min(count, 8) }, (_, i) => (
+            {Array.from({ length: Math.min(count, 6) }, (_, i) => (
               <div
                 key={i}
                 style={{
                   width: 10,
                   height: 10,
-                  background: `linear-gradient(135deg, ${THEATRE.manpowerBlock}, #5a2e00)`,
-                  borderRadius: 1,
+                  ...TOKEN_STYLES.manpower,
                   boxShadow: `1px 1px 2px ${THEATRE.blockShadow}`,
                 }}
               />
@@ -230,6 +231,79 @@ export function TheatreMap({
           </div>
         );
       })}
+
+      {/* Equipment + Food tokens — deeper in the rear (further below centroid) */}
+      {SECTOR_ORDER.map((id) => {
+        const def = THEATRE_SECTORS[id];
+        const sector = sectors[id];
+        const hasRear = sector.allocated.equipment + sector.allocated.food > 0;
+        if (!hasRear) return null;
+        return (
+          <div
+            key={`rear-${id}`}
+            style={{
+              position: 'absolute',
+              left: def.centroid[0] - 16,
+              top: def.centroid[1] + 38,
+              display: 'flex',
+              gap: 6,
+              pointerEvents: 'none',
+            }}
+          >
+            {(['equipment', 'food'] as const).map((res) => {
+              const count = Math.round(sector.allocated[res]);
+              if (count <= 0) return null;
+              return (
+                <div key={res} style={{ display: 'flex', flexDirection: 'column-reverse', gap: 2 }}>
+                  {Array.from({ length: Math.min(count, 6) }, (_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        width: 10,
+                        height: 10,
+                        ...TOKEN_STYLES[res],
+                        boxShadow: `1px 1px 2px ${THEATRE.blockShadow}`,
+                      }}
+                    />
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+
+      {/* Command marker — flag on chosen sector */}
+      {chosenSector && (
+        <div
+          style={{
+            position: 'absolute',
+            left: THEATRE_SECTORS[chosenSector].centroid[0] - 8,
+            top: THEATRE_SECTORS[chosenSector].centroid[1] - 28,
+            pointerEvents: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          {/* Flag */}
+          <div style={{
+            width: 16,
+            height: 12,
+            background: `linear-gradient(135deg, ${THEATRE.criticalSeal}, #6B2222)`,
+            borderRadius: '0 3px 3px 0',
+            boxShadow: `1px 1px 3px ${THEATRE.blockShadow}`,
+            marginLeft: 2,
+          }} />
+          {/* Pole */}
+          <div style={{
+            width: 2,
+            height: 18,
+            background: THEATRE.ink,
+            marginTop: -1,
+          }} />
+        </div>
+      )}
 
       {/* Active sector glow */}
       {activeSector && (

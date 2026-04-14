@@ -28,7 +28,7 @@ describe('Full theatre turn flow', () => {
     expect(s().currentTurn).toBe(1);
     const reviewSeal = selectSealState(s());
     expect(reviewSeal.enabled).toBe(true);
-    expect(reviewSeal.label).toBe('Commencer Allocation');
+    expect(reviewSeal.label).toBe('Begin Allocation');
 
     // Phase 2: Allocation
     s().advancePhase();

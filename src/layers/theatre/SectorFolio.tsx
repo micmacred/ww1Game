@@ -12,14 +12,13 @@ interface SectorFolioProps {
   isChosen: boolean;
   remainingPool: Resources;
   onAllocate: (resource: ResourceType, delta: 1 | -1) => void;
-  onChooseToFight: () => void;
 }
 
 function enemyStrengthLabel(strength: number): string {
-  if (strength < 2.5) return 'faibles';
-  if (strength < 3.5) return 'modérés';
-  if (strength < 4.5) return 'forts';
-  return 'très forts';
+  if (strength < 2.5) return 'weak';
+  if (strength < 3.5) return 'moderate';
+  if (strength < 4.5) return 'strong';
+  return 'very strong';
 }
 
 function strengthLevel(value: number): string {
@@ -29,13 +28,13 @@ function strengthLevel(value: number): string {
 }
 
 const RES_LABELS: Record<ResourceType, string> = {
-  manpower: 'Effectifs',
-  equipment: 'Matériel',
-  food: 'Ravitaillement',
+  manpower: 'Manpower',
+  equipment: 'Equipment',
+  food: 'Supply',
 };
 
 export function SectorFolio({
-  sector, definition, phase, isChosen, remainingPool, onAllocate, onChooseToFight,
+  sector, definition, phase, isChosen, remainingPool, onAllocate,
 }: SectorFolioProps) {
   const canAllocate = phase === 'allocate';
   const canChoose = phase === 'select';
@@ -66,7 +65,7 @@ export function SectorFolio({
         fontFamily: "'Special Elite', monospace", fontSize: 11,
         color: THEATRE.dimInk, marginBottom: 10,
       }}>
-        Forces ennemies: {enemyStrengthLabel(sector.enemyStrength)} •
+        Enemy forces: {enemyStrengthLabel(sector.enemyStrength)} •
         Position: {sector.frontPosition > 0 ? '+' : ''}{sector.frontPosition}
       </div>
 
@@ -126,23 +125,13 @@ export function SectorFolio({
         })}
       </div>
 
-      {/* Commander checkbox */}
+      {/* Command status */}
       {canChoose && (
-        <div onClick={onChooseToFight} style={{
-          display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 0',
+        <div style={{
+          fontFamily: FONTS.theatre, fontSize: 13, fontStyle: 'italic',
+          color: isChosen ? THEATRE.ink : THEATRE.dimInk, padding: '4px 0',
         }}>
-          <div style={{
-            width: 20, height: 20, border: `2px solid ${THEATRE.ink}`,
-            borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: isChosen ? THEATRE.ink : 'transparent', color: THEATRE.parchment, fontSize: 14,
-          }}>
-            {isChosen ? '✓' : ''}
-          </div>
-          <span style={{
-            fontFamily: FONTS.theatre, fontSize: 13, fontStyle: 'italic', color: THEATRE.ink,
-          }}>
-            Commander en personne ce tour-ci
-          </span>
+          {isChosen ? 'You will command this sector personally.' : 'Tap this sector on the map to command it.'}
         </div>
       )}
 

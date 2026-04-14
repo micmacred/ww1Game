@@ -59,6 +59,14 @@ export type TheatreTurnPhase =
   | 'update';
 
 export const PHASE_DISPLAY: Record<TheatreTurnPhase, string> = {
+  review: 'Review',
+  allocate: 'Allocate',
+  select: 'Select',
+  resolve: 'Resolve',
+  update: 'Update',
+};
+
+export const PHASE_DISPLAY_FR: Record<TheatreTurnPhase, string> = {
   review: 'Examen',
   allocate: 'Allocation',
   select: 'Sélection',

@@ -12,9 +12,9 @@ interface TurnLedgerProps {
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
   'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX'];
 
-const MONTHS_FR = [
-  'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet',
-  'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre', 'Janvier',
+const MONTHS = [
+  'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December', 'January',
 ];
 
 export function TurnLedger({ turn, phase, startMonth }: TurnLedgerProps) {
@@ -45,7 +45,7 @@ export function TurnLedger({ turn, phase, startMonth }: TurnLedgerProps) {
         {roman}
       </div>
       <div style={{ fontFamily: FONTS.theatre, fontSize: 12, color: THEATRE.fadedInk, textAlign: 'center' }}>
-        {MONTHS_FR[monthIndex]} {year}
+        {MONTHS[monthIndex]} {year}
       </div>
       <div style={{ marginTop: 'auto', fontFamily: FONTS.theatre, fontSize: 13, fontStyle: 'italic', color: THEATRE.parchment, opacity: 0.7 }}>
         {PHASE_DISPLAY[phase]}

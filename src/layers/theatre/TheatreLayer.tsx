@@ -105,6 +105,12 @@ export function TheatreLayer() {
     state.setRevealSpeed(4);
   }, [state]);
 
+  // Don't render until the store is initialized
+  const hasInitialized = Object.keys(state.sectors).length > 0;
+  if (!hasInitialized) {
+    return <div style={{ width: 1024, height: 768, background: '#F5E6D3' }} />;
+  }
+
   return (
     <div style={{ width: 1024, height: 768, overflow: 'hidden', position: 'relative', margin: '0 auto' }}>
       {/* Map area */}
@@ -143,7 +149,6 @@ export function TheatreLayer() {
           isChosen={state.chosenSector === activeSector}
           remainingPool={remainingPool}
           onAllocate={(res, delta) => state.allocateSurplus(activeSector, res, delta)}
-          onChooseToFight={() => state.chooseToFight(activeSector)}
         />
         <DispatchStack
           dispatches={state.dispatches}

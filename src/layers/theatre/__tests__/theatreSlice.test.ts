@@ -154,7 +154,7 @@ describe('selectors', () => {
   it('selectSealState returns enabled in review phase', () => {
     const seal = selectSealState(store.getState());
     expect(seal.enabled).toBe(true);
-    expect(seal.label).toBe('Commencer Allocation');
+    expect(seal.label).toBe('Begin Allocation');
   });
 
   it('selectSealState disabled in select phase without chosen sector', () => {

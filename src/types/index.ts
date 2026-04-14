@@ -15,7 +15,7 @@ export type {
   DispatchCategory, TheatreDispatch, TheatreTurnPhase,
   SealState, TheatreSaveState,
 } from './theatre';
-export { SECTOR_IDS, PHASE_DISPLAY } from './theatre';
+export { SECTOR_IDS, PHASE_DISPLAY, PHASE_DISPLAY_FR } from './theatre';
 
 export type {
   DogfightOrder,
